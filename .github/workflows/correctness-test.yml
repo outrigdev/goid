@@ -321,7 +321,7 @@ jobs:
             os=$(echo $meta | cut -d- -f1)
             arch=$(echo $meta | cut -d- -f2)
             gov=$(echo $meta | cut -d- -f3 | sed 's/Go//')
-            tail -n +1 "$file" | \
+            tail -n +1 "$file" | tr -d '\r' | \
               awk -v os="$os" -v arch="$arch" -v gov="$gov" -F"\t" 'BEGIN{OFS="\t"}{print os,arch,gov,$0}' \
               >> combined-bench.tsv
           done
@@ -334,10 +334,20 @@ jobs:
             os=$(echo $meta | cut -d- -f1)
             arch=$(echo $meta | cut -d- -f2)
             gov=$(echo $meta | cut -d- -f3 | sed 's/Go//')
-            tail -n +1 "$file" | \
+            tail -n +1 "$file" | tr -d '\r' | \
               awk -v os="$os" -v arch="$arch" -v gov="$gov" -F"\t" 'BEGIN{OFS="\t"}{print os,arch,gov,$0}' \
               >> combined-tests.tsv
           done
+
+      - name: Debug - Show combined results
+        run: |
+          echo "=== Combined Bench Results ==="
+          cat combined-bench.tsv
+          echo "=== End Combined Bench Results ==="
+          echo ""
+          echo "=== Combined Test Results ==="
+          cat combined-tests.tsv
+          echo "=== End Combined Test Results ==="
 
       - name: Upload combined results
         uses: actions/upload-artifact@v4
