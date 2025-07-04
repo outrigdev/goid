@@ -24,8 +24,24 @@ jobs:
       - name: Build
         run: go build -v ./...
 
-      - name: Run tests
-        run: go test -v -bench=. ./...
+      - name: Run tests + benches (JSON)
+        run: go test -bench=. -json ./... > results.json
+
+      - name: Extract bench results
+        run: |
+          jq -r 'select(.Action=="bench") | [.Package, .Benchmark, (.Result.NSPerOp|tostring)] | @tsv' results.json > bench.tsv
+
+      - name: Extract test results
+        run: |
+          jq -r 'select((.Action=="pass" or .Action=="fail") and .Test) | [.Package, .Test, .Action, (.Elapsed|tostring)] | @tsv' results.json > tests.tsv
+
+      - name: Upload results
+        uses: actions/upload-artifact@v4
+        with:
+          name: results-linux-amd64-Go${{ matrix.go-version }}
+          path: |
+            bench.tsv
+            tests.tsv
 
   test-linux-arm64:
     strategy:
@@ -47,8 +63,24 @@ jobs:
       - name: Build
         run: go build -v ./...
 
-      - name: Run tests
-        run: go test -v -bench=. ./...
+      - name: Run tests + benches (JSON)
+        run: go test -bench=. -json ./... > results.json
+
+      - name: Extract bench results
+        run: |
+          jq -r 'select(.Action=="bench") | [.Package, .Benchmark, (.Result.NSPerOp|tostring)] | @tsv' results.json > bench.tsv
+
+      - name: Extract test results
+        run: |
+          jq -r 'select((.Action=="pass" or .Action=="fail") and .Test) | [.Package, .Test, .Action, (.Elapsed|tostring)] | @tsv' results.json > tests.tsv
+
+      - name: Upload results
+        uses: actions/upload-artifact@v4
+        with:
+          name: results-linux-arm64-Go${{ matrix.go-version }}
+          path: |
+            bench.tsv
+            tests.tsv
 
   test-linux-armv7:
     strategy:
@@ -80,7 +112,17 @@ jobs:
             export GOARCH=arm
             export GOARM=7
             cd /go/src/app
-            go test -v -bench=. ./...
+            go test -bench=. -json ./... > results.json
+            jq -r 'select(.Action=="bench") | [.Package, .Benchmark, (.Result.NSPerOp|tostring)] | @tsv' results.json > bench.tsv
+            jq -r 'select((.Action=="pass" or .Action=="fail") and .Test) | [.Package, .Test, .Action, (.Elapsed|tostring)] | @tsv' results.json > tests.tsv
+
+      - name: Upload results
+        uses: actions/upload-artifact@v4
+        with:
+          name: results-linux-armv7-Go${{ matrix.go-version }}
+          path: |
+            bench.tsv
+            tests.tsv
 
   test-darwin-amd64:
     strategy:
@@ -102,8 +144,24 @@ jobs:
       - name: Build
         run: go build -v ./...
 
-      - name: Run tests
-        run: go test -v -bench=. ./...
+      - name: Run tests + benches (JSON)
+        run: go test -bench=. -json ./... > results.json
+
+      - name: Extract bench results
+        run: |
+          jq -r 'select(.Action=="bench") | [.Package, .Benchmark, (.Result.NSPerOp|tostring)] | @tsv' results.json > bench.tsv
+
+      - name: Extract test results
+        run: |
+          jq -r 'select((.Action=="pass" or .Action=="fail") and .Test) | [.Package, .Test, .Action, (.Elapsed|tostring)] | @tsv' results.json > tests.tsv
+
+      - name: Upload results
+        uses: actions/upload-artifact@v4
+        with:
+          name: results-darwin-amd64-Go${{ matrix.go-version }}
+          path: |
+            bench.tsv
+            tests.tsv
 
   test-darwin-arm64:
     strategy:
@@ -125,8 +183,24 @@ jobs:
       - name: Build
         run: go build -v ./...
 
-      - name: Run tests
-        run: go test -v -bench=. ./...
+      - name: Run tests + benches (JSON)
+        run: go test -bench=. -json ./... > results.json
+
+      - name: Extract bench results
+        run: |
+          jq -r 'select(.Action=="bench") | [.Package, .Benchmark, (.Result.NSPerOp|tostring)] | @tsv' results.json > bench.tsv
+
+      - name: Extract test results
+        run: |
+          jq -r 'select((.Action=="pass" or .Action=="fail") and .Test) | [.Package, .Test, .Action, (.Elapsed|tostring)] | @tsv' results.json > tests.tsv
+
+      - name: Upload results
+        uses: actions/upload-artifact@v4
+        with:
+          name: results-darwin-arm64-Go${{ matrix.go-version }}
+          path: |
+            bench.tsv
+            tests.tsv
 
   test-windows:
     strategy:
@@ -146,13 +220,78 @@ jobs:
           go-version: ${{ matrix.go-version }}
           cache: false
 
-      - name: Configure architecture
-        run: |
-          if ("${{ matrix.arch }}" -eq "amd64") { echo "GOARCH=amd64" | Out-File -FilePath $env:GITHUB_ENV -Append }
-          elseif ("${{ matrix.arch }}" -eq "386") { echo "GOARCH=386" | Out-File -FilePath $env:GITHUB_ENV -Append }
+      - name: Configure GOARCH
+        run: echo "GOARCH=${{ matrix.arch }}" >> $GITHUB_ENV
 
       - name: Build
         run: go build -v ./...
 
-      - name: Run tests
-        run: go test -v -bench="." ./...
+      - name: Run tests + benches (JSON)
+        run: go test -bench="." -json ./... > results.json
+
+      - name: Extract bench results
+        run: |
+          jq -r 'select(.Action=="bench") | [.Package, .Benchmark, (.Result.NSPerOp|tostring)] | @tsv' results.json > bench.tsv
+
+      - name: Extract test results
+        run: |
+          jq -r 'select((.Action=="pass" or .Action=="fail") and .Test) | [.Package, .Test, .Action, (.Elapsed|tostring)] | @tsv' results.json > tests.tsv
+
+      - name: Upload results
+        uses: actions/upload-artifact@v4
+        with:
+          name: results-windows-${{ matrix.arch }}-Go${{ matrix.go-version }}
+          path: |
+            bench.tsv
+            tests.tsv
+
+  aggregate-results:
+    name: Aggregate Bench & Test Results
+    runs-on: ubuntu-latest
+    needs:
+      - test-linux-amd64
+      - test-linux-arm64
+      - test-linux-armv7
+      - test-darwin-amd64
+      - test-darwin-arm64
+      - test-windows
+    steps:
+      - name: Download all matrix artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: Combine bench results
+        run: |
+          echo -e "os\tarch\tgo-version\tpackage\tbenchmark\tns/op" > combined-bench.tsv
+          for file in artifacts/**/bench.tsv; do
+            # derive metadata from artifact folder name, e.g. results-linux-amd64-Go1.21
+            meta=$(dirname "$file" | sed 's|artifacts/results-||')
+            os=$(echo $meta | cut -d- -f1)
+            arch=$(echo $meta | cut -d- -f2)
+            gov=$(echo $meta | cut -d- -f3 | sed 's/Go//')
+            tail -n +1 "$file" | \
+              awk -v os="$os" -v arch="$arch" -v gov="$gov" -F"\t" 'BEGIN{OFS="\t"}{print os,arch,gov,$0}' \
+              >> combined-bench.tsv
+          done
+
+      - name: Combine test results
+        run: |
+          echo -e "os\tarch\tgo-version\tpackage\ttest\taction\telapsed" > combined-tests.tsv
+          for file in artifacts/**/tests.tsv; do
+            meta=$(dirname "$file" | sed 's|artifacts/results-||')
+            os=$(echo $meta | cut -d- -f1)
+            arch=$(echo $meta | cut -d- -f2)
+            gov=$(echo $meta | cut -d- -f3 | sed 's/Go//')
+            tail -n +1 "$file" | \
+              awk -v os="$os" -v arch="$arch" -v gov="$gov" -F"\t" 'BEGIN{OFS="\t"}{print os,arch,gov,$0}' \
+              >> combined-tests.tsv
+          done
+
+      - name: Upload combined results
+        uses: actions/upload-artifact@v4
+        with:
+          name: combined-results
+          path: |
+            combined-bench.tsv
+            combined-tests.tsv
