@@ -6,7 +6,7 @@ A high-performance Go package for retrieving the current goroutine ID.
 
 - **Optimized for Go 1.23 and 1.24** on **amd64** and **arm64** architectures
 - **Future-proofed**: Automatic fallback to stack trace method for newer and older Go versions or unsupported architectures
-- **Universal compatibility**: Works on all Go versions and architectures
+- **Universal compatibility**: Works on all Go versions and architectures (via slower fallback for unsupported versions)
 
 ## Overview
 
@@ -73,15 +73,15 @@ PASS
 ok  	github.com/outrigdev/goid	2.697s
 ```
 
-The optimized `Get()` function is approximately **1,200x faster** than the stack trace method, demonstrating the significant performance benefit of the assembly optimization.
+The optimized `Get()` function is approximately **1000x+ faster** than the stack trace method, demonstrating the significant performance benefit of the assembly optimization.
+
+This substantial speed-up is particularly beneficial for debugging, tracing, logging, or other scenarios where retrieving goroutine IDs frequently occurs.
 
 ## Supported Platforms
 
 ### Optimized Assembly Implementation
-- Go 1.23+ on amd64 architecture
-- Go 1.24+ on amd64 architecture  
-- Go 1.23+ on arm64 architecture
-- Go 1.24+ on arm64 architecture
+- Go 1.23, 1.24 on amd64 architecture
+- Go 1.23, 1.24 on arm64 architecture
 
 ### Stack Trace Fallback
 - All Go versions on all architectures
@@ -114,6 +114,21 @@ Many other goroutine ID libraries attempt to use these internal structures but f
 3. **Automatic fallback**: When the optimized version isn't available, the package automatically uses the universal stack trace method
 
 The assembly functions (`getg()`) retrieve the current goroutine pointer, and the Go code then accesses the `goid` field directly from the version-matched struct, ensuring both safety and performance.
+
+## Implementation Matrix
+
+| Go Version | Architecture | getg() Assembly | Optimized | Implementation |
+|------------|--------------|-----------------|-----------|----------------|
+| pre-1.23   | all          | ❌              | ❌        | Stack trace fallback |
+| 1.23       | amd64        | ✅              | ✅        | Assembly + struct access |
+| 1.23       | arm64        | ✅              | ✅        | Assembly + struct access |
+| 1.23       | other        | ❌              | ❌        | Stack trace fallback |
+| 1.24       | amd64        | ✅              | ✅        | Assembly + struct access |
+| 1.24       | arm64        | ✅              | ✅        | Assembly + struct access |
+| 1.24       | other        | ❌              | ❌        | Stack trace fallback |
+| 1.25+      | all          | ❌              | ❌        | Stack trace fallback |
+
+**Note**: Go 1.25 optimization will be added as soon as Go 1.25 stable is released.
 
 ## License
 
