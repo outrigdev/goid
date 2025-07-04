@@ -1,0 +1,16 @@
+goid
+Copyright 2025 Command Line Inc.
+
+This product includes software developed at Command Line Inc.
+
+This software contains code derived from the Go programming language runtime,
+specifically the internal goroutine structure definitions from:
+- Go 1.23 runtime source code
+- Go 1.24 runtime source code
+
+The Go programming language is licensed under the BSD-style license:
+https://golang.org/LICENSE
+
+The goroutine structure definitions included in this software are exact copies
+from the Go runtime source code and are used under the terms of Go's license
+for the purpose of binary compatibility with the Go runtime.
