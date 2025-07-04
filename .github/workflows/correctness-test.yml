@@ -27,9 +27,18 @@ jobs:
       - name: Run tests + benches (JSON)
         run: go test -bench=. -json ./... > results.json
 
+      - name: Debug - Show JSON output
+        run: |
+          echo "=== JSON test output ==="
+          cat results.json
+          echo "=== End JSON output ==="
+
       - name: Extract bench results
         run: |
-          jq -r 'select(.Action=="bench") | [.Package, .Benchmark, (.Result.NSPerOp|tostring)] | @tsv' results.json > bench.tsv
+          jq -r 'select(.Action=="output" and .Output and (.Output | test("^Benchmark.*\\t.*\\t.*ns/op"))) | [.Package, (.Output | capture("^(?<bench>\\S+)\\s+") | .bench), (.Output | capture(".*\\t.*\\t\\s*(?<nsop>[0-9.]+)\\s*ns/op") | .nsop)] | @tsv' results.json > bench.tsv
+          echo "=== Bench TSV output ==="
+          cat bench.tsv
+          echo "=== End Bench TSV ==="
 
       - name: Extract test results
         run: |
@@ -66,9 +75,18 @@ jobs:
       - name: Run tests + benches (JSON)
         run: go test -bench=. -json ./... > results.json
 
+      - name: Debug - Show JSON output
+        run: |
+          echo "=== JSON test output ==="
+          cat results.json
+          echo "=== End JSON output ==="
+
       - name: Extract bench results
         run: |
-          jq -r 'select(.Action=="bench") | [.Package, .Benchmark, (.Result.NSPerOp|tostring)] | @tsv' results.json > bench.tsv
+          jq -r 'select(.Action=="output" and .Output and (.Output | test("^Benchmark.*\\t.*\\t.*ns/op"))) | [.Package, (.Output | capture("^(?<bench>\\S+)\\s+") | .bench), (.Output | capture(".*\\t.*\\t\\s*(?<nsop>[0-9.]+)\\s*ns/op") | .nsop)] | @tsv' results.json > bench.tsv
+          echo "=== Bench TSV output ==="
+          cat bench.tsv
+          echo "=== End Bench TSV ==="
 
       - name: Extract test results
         run: |
@@ -104,7 +122,7 @@ jobs:
           dockerRunArgs: |
             --volume "${PWD}:/go/src/app"
           run: |
-            apt update && apt install -y wget
+            apt update && apt install -y wget jq
             wget https://golang.org/dl/go${{ matrix.go-version }}.linux-armv6l.tar.gz
             rm -rf /usr/local/go
             tar -C /usr/local -xzf go${{ matrix.go-version }}.linux-armv6l.tar.gz
@@ -113,7 +131,13 @@ jobs:
             export GOARM=7
             cd /go/src/app
             go test -bench=. -json ./... > results.json
-            jq -r 'select(.Action=="bench") | [.Package, .Benchmark, (.Result.NSPerOp|tostring)] | @tsv' results.json > bench.tsv
+            echo "=== JSON test output ==="
+            cat results.json
+            echo "=== End JSON output ==="
+            jq -r 'select(.Action=="output" and .Output and (.Output | test("^Benchmark.*\\t.*\\t.*ns/op"))) | [.Package, (.Output | capture("^(?<bench>\\S+)\\s+") | .bench), (.Output | capture(".*\\t.*\\t\\s*(?<nsop>[0-9.]+)\\s*ns/op") | .nsop)] | @tsv' results.json > bench.tsv
+            echo "=== Bench TSV output ==="
+            cat bench.tsv
+            echo "=== End Bench TSV ==="
             jq -r 'select((.Action=="pass" or .Action=="fail") and .Test) | [.Package, .Test, .Action, (.Elapsed|tostring)] | @tsv' results.json > tests.tsv
 
       - name: Upload results
@@ -147,9 +171,18 @@ jobs:
       - name: Run tests + benches (JSON)
         run: go test -bench=. -json ./... > results.json
 
+      - name: Debug - Show JSON output
+        run: |
+          echo "=== JSON test output ==="
+          cat results.json
+          echo "=== End JSON output ==="
+
       - name: Extract bench results
         run: |
-          jq -r 'select(.Action=="bench") | [.Package, .Benchmark, (.Result.NSPerOp|tostring)] | @tsv' results.json > bench.tsv
+          jq -r 'select(.Action=="output" and .Output and (.Output | test("^Benchmark.*\\t.*\\t.*ns/op"))) | [.Package, (.Output | capture("^(?<bench>\\S+)\\s+") | .bench), (.Output | capture(".*\\t.*\\t\\s*(?<nsop>[0-9.]+)\\s*ns/op") | .nsop)] | @tsv' results.json > bench.tsv
+          echo "=== Bench TSV output ==="
+          cat bench.tsv
+          echo "=== End Bench TSV ==="
 
       - name: Extract test results
         run: |
@@ -186,9 +219,18 @@ jobs:
       - name: Run tests + benches (JSON)
         run: go test -bench=. -json ./... > results.json
 
+      - name: Debug - Show JSON output
+        run: |
+          echo "=== JSON test output ==="
+          type results.json
+          echo "=== End JSON output ==="
+
       - name: Extract bench results
         run: |
-          jq -r 'select(.Action=="bench") | [.Package, .Benchmark, (.Result.NSPerOp|tostring)] | @tsv' results.json > bench.tsv
+          jq -r 'select(.Action=="output" and .Output and (.Output | test("^Benchmark.*\\t.*\\t.*ns/op"))) | [.Package, (.Output | capture("^(?<bench>\\S+)\\s+") | .bench), (.Output | capture(".*\\t.*\\t\\s*(?<nsop>[0-9.]+)\\s*ns/op") | .nsop)] | @tsv' results.json > bench.tsv
+          echo "=== Bench TSV output ==="
+          cat bench.tsv
+          echo "=== End Bench TSV ==="
 
       - name: Extract test results
         run: |
@@ -229,9 +271,18 @@ jobs:
       - name: Run tests + benches (JSON)
         run: go test -bench="." -json ./... > results.json
 
+      - name: Debug - Show JSON output
+        run: |
+          Write-Host "=== JSON test output ==="
+          type results.json
+          Write-Host "=== End JSON output ==="
+
       - name: Extract bench results
         run: |
-          jq -r 'select(.Action=="bench") | [.Package, .Benchmark, (.Result.NSPerOp|tostring)] | @tsv' results.json > bench.tsv
+          jq -r 'select(.Action=="output" and .Output and (.Output | test("^Benchmark.*\\t.*\\t.*ns/op"))) | [.Package, (.Output | capture("^(?<bench>\\S+)\\s+") | .bench), (.Output | capture(".*\\t.*\\t\\s*(?<nsop>[0-9.]+)\\s*ns/op") | .nsop)] | @tsv' results.json > bench.tsv
+          Write-Host "=== Bench TSV output ==="
+          type bench.tsv
+          Write-Host "=== End Bench TSV ==="
 
       - name: Extract test results
         run: |
