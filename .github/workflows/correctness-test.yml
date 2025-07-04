@@ -51,8 +51,8 @@ jobs:
         if: matrix.arch != 'amd64'
         uses: uraimo/run-on-arch-action@v3
         with:
-          arch: ${{ matrix.arch }}
-          distro: bullseye
+          arch: ${{ matrix.arch == 'arm64' && 'aarch64' || matrix.arch }}
+          distro: bookworm
           dockerRunArgs: |
             --volume "${PWD}:/go/src/app"
           run: |
