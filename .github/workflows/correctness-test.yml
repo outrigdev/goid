@@ -222,7 +222,7 @@ jobs:
       - name: Debug - Show JSON output
         run: |
           echo "=== JSON test output ==="
-          type results.json
+          cat results.json
           echo "=== End JSON output ==="
 
       - name: Extract bench results
