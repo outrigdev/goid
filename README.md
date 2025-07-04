@@ -67,10 +67,10 @@ goos: darwin
 goarch: arm64
 pkg: github.com/outrigdev/goid
 cpu: Apple M3 Pro
-BenchmarkGet-12             	769931396	         1.334 ns/op
-BenchmarkGetFromStack-12    	  733010	      1605 ns/op
-PASS
-ok  	github.com/outrigdev/goid	2.697s
+BenchmarkGet
+BenchmarkGet-12                 879633932                1.306 ns/op
+BenchmarkGetFromStack
+BenchmarkGetFromStack-12          749905              1561 ns/op
 ```
 
 The optimized `Get()` function is approximately **1000x+ faster** than the stack trace method, demonstrating the significant performance benefit of the assembly optimization.
@@ -92,7 +92,7 @@ This substantial speed-up is particularly beneficial for debugging, tracing, log
 The package uses build constraints to select the appropriate implementation:
 
 1. **Assembly Method**: Directly accesses the goroutine structure in memory using assembly code to read the `goid` field
-2. **Stack Trace Method**: Parses the first line of `runtime.Stack()` output to extract the goroutine ID using regex
+2. **Stack Trace Method**: Parses the first line of `runtime.Stack()` output to extract the goroutine ID using optimized string parsing (regexp-free for better performance)
 
 The assembly method is significantly faster but requires knowledge of the internal Go runtime structures, which can change between Go versions. The stack trace method is slower but works across all Go versions.
 
