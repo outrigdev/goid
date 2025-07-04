@@ -32,7 +32,7 @@ jobs:
       matrix:
         go-version: ['1.21', '1.22', '1.23', '1.24']
 
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04-arm
 
     steps:
       - uses: actions/checkout@v4
@@ -41,9 +41,6 @@ jobs:
         uses: actions/setup-go@v5
         with:
           go-version: ${{ matrix.go-version }}
-
-      - name: Configure architecture
-        run: echo GOARCH=arm64 >> "$GITHUB_ENV"
 
       - name: Build
         run: go build -v ./...
@@ -55,7 +52,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        go-version: ['1.21', '1.22', '1.23', '1.24']
+        go-version: ['1.21.13', '1.22.12', '1.23.10', '1.24.4'] # need patch versions for armv7 downloads
 
     runs-on: ubuntu-latest
 
@@ -75,12 +72,57 @@ jobs:
           run: |
             apt update && apt install -y wget
             wget https://golang.org/dl/go${{ matrix.go-version }}.linux-armv6l.tar.gz
+            rm -rf /usr/local/go
             tar -C /usr/local -xzf go${{ matrix.go-version }}.linux-armv6l.tar.gz
-            export PATH=$PATH:/usr/local/go/bin
+            export PATH=/usr/local/go/bin:$PATH
             export GOARCH=arm
             export GOARM=7
             cd /go/src/app
             go test -v -bench=. ./...
+
+  test-darwin-amd64:
+    strategy:
+      fail-fast: false
+      matrix:
+        go-version: ['1.21', '1.22', '1.23', '1.24']
+
+    runs-on: macos-13
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: ${{ matrix.go-version }}
+
+      - name: Build
+        run: go build -v ./...
+
+      - name: Run tests
+        run: go test -v -bench=. ./...
+
+  test-darwin-arm64:
+    strategy:
+      fail-fast: false
+      matrix:
+        go-version: ['1.21', '1.22', '1.23', '1.24']
+
+    runs-on: macos-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: ${{ matrix.go-version }}
+
+      - name: Build
+        run: go build -v ./...
+
+      - name: Run tests
+        run: go test -v -bench=. ./...
 
   test-windows:
     strategy:
