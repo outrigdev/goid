@@ -8,6 +8,10 @@ import (
 	"runtime"
 )
 
+const goroutinePrefix = "goroutine "
+
+var goroutinePrefixBytes = []byte(goroutinePrefix)
+
 // GetFromStack extracts goroutine ID from stack trace (fallback method)
 // optimized to avoid allocations and regexps.
 func GetFromStack() uint64 {
@@ -15,12 +19,11 @@ func GetFromStack() uint64 {
 	n := runtime.Stack(buf[:], false)
 	b := buf[:n]
 
-	const prefix = "goroutine "
 	// fast HasPrefix (no alloc)
-	if !bytes.HasPrefix(b, []byte(prefix)) {
+	if !bytes.HasPrefix(b, goroutinePrefixBytes) {
 		return 0
 	}
-	b = b[len(prefix):]
+	b = b[len(goroutinePrefix):]
 
 	// find end of ID (space before “[status]”)
 	idx := bytes.IndexByte(b, ' ')
