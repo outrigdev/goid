@@ -1,4 +1,4 @@
-name: Correctness Test for goid
+name: Test and Benchmark for goid
 
 on:
   workflow_dispatch:
