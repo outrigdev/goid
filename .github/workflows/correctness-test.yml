@@ -269,22 +269,26 @@ jobs:
         run: go build -v ./...
 
       - name: Run tests + benches (JSON)
-        run: go test -bench="." -json ./... > results.json
+        shell: bash
+        run: go test -bench=. -json ./... > results.json
 
       - name: Debug - Show JSON output
+        shell: bash
         run: |
-          Write-Host "=== JSON test output ==="
-          type results.json
-          Write-Host "=== End JSON output ==="
+          echo "=== JSON test output ==="
+          cat results.json
+          echo "=== End JSON output ==="
 
       - name: Extract bench results
+        shell: bash
         run: |
           jq -r 'select(.Action=="output" and .Output and (.Output | test("^Benchmark.*\\t.*\\t.*ns/op"))) | [.Package, (.Output | capture("^(?<bench>\\S+)\\s+") | .bench), (.Output | capture(".*\\t.*\\t\\s*(?<nsop>[0-9.]+)\\s*ns/op") | .nsop)] | @tsv' results.json > bench.tsv
-          Write-Host "=== Bench TSV output ==="
-          type bench.tsv
-          Write-Host "=== End Bench TSV ==="
+          echo "=== Bench TSV output ==="
+          cat bench.tsv
+          echo "=== End Bench TSV ==="
 
       - name: Extract test results
+        shell: bash
         run: |
           jq -r 'select((.Action=="pass" or .Action=="fail") and .Test) | [.Package, .Test, .Action, (.Elapsed|tostring)] | @tsv' results.json > tests.tsv
 
