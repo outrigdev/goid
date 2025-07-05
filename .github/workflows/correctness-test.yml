@@ -24,25 +24,28 @@ jobs:
       - name: Build
         run: go build -v ./...
 
-      - name: Run tests + benches (JSON)
-        run: go test -bench=. -json ./... > results.json
+      - name: Run tests + benches
+        run: go test -bench=. ./... > results.txt
 
-      - name: Debug - Show JSON output
+      - name: Debug - Show test output
         run: |
-          echo "=== JSON test output ==="
-          cat results.json
-          echo "=== End JSON output ==="
+          echo "=== Test output ==="
+          cat results.txt
+          echo "=== End test output ==="
 
       - name: Extract bench results
         run: |
-          jq -r 'select(.Action=="output" and .Output and (.Output | test("^Benchmark.*\\t.*\\t.*ns/op"))) | [.Package, (.Output | capture("^(?<bench>\\S+)\\s+") | .bench), (.Output | capture(".*\\t.*\\t\\s*(?<nsop>[0-9.]+)\\s*ns/op") | .nsop)] | @tsv' results.json > bench.tsv
-          echo "=== Bench TSV output ==="
+          grep "^Benchmark" results.txt > bench.tsv
+          echo "=== Bench results ==="
           cat bench.tsv
-          echo "=== End Bench TSV ==="
+          echo "=== End bench results ==="
 
       - name: Extract test results
         run: |
-          jq -r 'select((.Action=="pass" or .Action=="fail") and .Test) | [.Package, .Test, .Action, (.Elapsed|tostring)] | @tsv' results.json > tests.tsv
+          grep "github.com/outrigdev/goid" results.txt | grep -i "ok\|fail" > tests.tsv
+          echo "=== Test results ==="
+          cat tests.tsv
+          echo "=== End test results ==="
 
       - name: Upload results
         uses: actions/upload-artifact@v4
@@ -72,25 +75,28 @@ jobs:
       - name: Build
         run: go build -v ./...
 
-      - name: Run tests + benches (JSON)
-        run: go test -bench=. -json ./... > results.json
+      - name: Run tests + benches
+        run: go test -bench=. ./... > results.txt
 
-      - name: Debug - Show JSON output
+      - name: Debug - Show test output
         run: |
-          echo "=== JSON test output ==="
-          cat results.json
-          echo "=== End JSON output ==="
+          echo "=== Test output ==="
+          cat results.txt
+          echo "=== End test output ==="
 
       - name: Extract bench results
         run: |
-          jq -r 'select(.Action=="output" and .Output and (.Output | test("^Benchmark.*\\t.*\\t.*ns/op"))) | [.Package, (.Output | capture("^(?<bench>\\S+)\\s+") | .bench), (.Output | capture(".*\\t.*\\t\\s*(?<nsop>[0-9.]+)\\s*ns/op") | .nsop)] | @tsv' results.json > bench.tsv
-          echo "=== Bench TSV output ==="
+          grep "^Benchmark" results.txt > bench.tsv
+          echo "=== Bench results ==="
           cat bench.tsv
-          echo "=== End Bench TSV ==="
+          echo "=== End bench results ==="
 
       - name: Extract test results
         run: |
-          jq -r 'select((.Action=="pass" or .Action=="fail") and .Test) | [.Package, .Test, .Action, (.Elapsed|tostring)] | @tsv' results.json > tests.tsv
+          grep "github.com/outrigdev/goid" results.txt | grep -i "ok\|fail" > tests.tsv
+          echo "=== Test results ==="
+          cat tests.tsv
+          echo "=== End test results ==="
 
       - name: Upload results
         uses: actions/upload-artifact@v4
@@ -122,7 +128,7 @@ jobs:
           dockerRunArgs: |
             --volume "${PWD}:/go/src/app"
           run: |
-            apt update && apt install -y wget jq
+            apt update && apt install -y wget
             wget https://golang.org/dl/go${{ matrix.go-version }}.linux-armv6l.tar.gz
             rm -rf /usr/local/go
             tar -C /usr/local -xzf go${{ matrix.go-version }}.linux-armv6l.tar.gz
@@ -130,15 +136,18 @@ jobs:
             export GOARCH=arm
             export GOARM=7
             cd /go/src/app
-            go test -bench=. -json ./... > results.json
-            echo "=== JSON test output ==="
-            cat results.json
-            echo "=== End JSON output ==="
-            jq -r 'select(.Action=="output" and .Output and (.Output | test("^Benchmark.*\\t.*\\t.*ns/op"))) | [.Package, (.Output | capture("^(?<bench>\\S+)\\s+") | .bench), (.Output | capture(".*\\t.*\\t\\s*(?<nsop>[0-9.]+)\\s*ns/op") | .nsop)] | @tsv' results.json > bench.tsv
-            echo "=== Bench TSV output ==="
+            go test -bench=. ./... > results.txt
+            echo "=== Test output ==="
+            cat results.txt
+            echo "=== End test output ==="
+            grep "^Benchmark" results.txt > bench.tsv
+            echo "=== Bench results ==="
             cat bench.tsv
-            echo "=== End Bench TSV ==="
-            jq -r 'select((.Action=="pass" or .Action=="fail") and .Test) | [.Package, .Test, .Action, (.Elapsed|tostring)] | @tsv' results.json > tests.tsv
+            echo "=== End bench results ==="
+            grep "github.com/outrigdev/goid" results.txt | grep -i "ok\|fail" > tests.tsv
+            echo "=== Test results ==="
+            cat tests.tsv
+            echo "=== End test results ==="
 
       - name: Upload results
         uses: actions/upload-artifact@v4
@@ -168,25 +177,28 @@ jobs:
       - name: Build
         run: go build -v ./...
 
-      - name: Run tests + benches (JSON)
-        run: go test -bench=. -json ./... > results.json
+      - name: Run tests + benches
+        run: go test -bench=. ./... > results.txt
 
-      - name: Debug - Show JSON output
+      - name: Debug - Show test output
         run: |
-          echo "=== JSON test output ==="
-          cat results.json
-          echo "=== End JSON output ==="
+          echo "=== Test output ==="
+          cat results.txt
+          echo "=== End test output ==="
 
       - name: Extract bench results
         run: |
-          jq -r 'select(.Action=="output" and .Output and (.Output | test("^Benchmark.*\\t.*\\t.*ns/op"))) | [.Package, (.Output | capture("^(?<bench>\\S+)\\s+") | .bench), (.Output | capture(".*\\t.*\\t\\s*(?<nsop>[0-9.]+)\\s*ns/op") | .nsop)] | @tsv' results.json > bench.tsv
-          echo "=== Bench TSV output ==="
+          grep "^Benchmark" results.txt > bench.tsv
+          echo "=== Bench results ==="
           cat bench.tsv
-          echo "=== End Bench TSV ==="
+          echo "=== End bench results ==="
 
       - name: Extract test results
         run: |
-          jq -r 'select((.Action=="pass" or .Action=="fail") and .Test) | [.Package, .Test, .Action, (.Elapsed|tostring)] | @tsv' results.json > tests.tsv
+          grep "github.com/outrigdev/goid" results.txt | grep -i "ok\|fail" > tests.tsv
+          echo "=== Test results ==="
+          cat tests.tsv
+          echo "=== End test results ==="
 
       - name: Upload results
         uses: actions/upload-artifact@v4
@@ -216,25 +228,28 @@ jobs:
       - name: Build
         run: go build -v ./...
 
-      - name: Run tests + benches (JSON)
-        run: go test -bench=. -json ./... > results.json
+      - name: Run tests + benches
+        run: go test -bench=. ./... > results.txt
 
-      - name: Debug - Show JSON output
+      - name: Debug - Show test output
         run: |
-          echo "=== JSON test output ==="
-          cat results.json
-          echo "=== End JSON output ==="
+          echo "=== Test output ==="
+          cat results.txt
+          echo "=== End test output ==="
 
       - name: Extract bench results
         run: |
-          jq -r 'select(.Action=="output" and .Output and (.Output | test("^Benchmark.*\\t.*\\t.*ns/op"))) | [.Package, (.Output | capture("^(?<bench>\\S+)\\s+") | .bench), (.Output | capture(".*\\t.*\\t\\s*(?<nsop>[0-9.]+)\\s*ns/op") | .nsop)] | @tsv' results.json > bench.tsv
-          echo "=== Bench TSV output ==="
+          grep "^Benchmark" results.txt > bench.tsv
+          echo "=== Bench results ==="
           cat bench.tsv
-          echo "=== End Bench TSV ==="
+          echo "=== End bench results ==="
 
       - name: Extract test results
         run: |
-          jq -r 'select((.Action=="pass" or .Action=="fail") and .Test) | [.Package, .Test, .Action, (.Elapsed|tostring)] | @tsv' results.json > tests.tsv
+          grep "github.com/outrigdev/goid" results.txt | grep -i "ok\|fail" > tests.tsv
+          echo "=== Test results ==="
+          cat tests.tsv
+          echo "=== End test results ==="
 
       - name: Upload results
         uses: actions/upload-artifact@v4
@@ -268,29 +283,32 @@ jobs:
       - name: Build
         run: go build -v ./...
 
-      - name: Run tests + benches (JSON)
+      - name: Run tests + benches
         shell: bash
-        run: go test -bench=. -json ./... > results.json
+        run: go test -bench=. ./... > results.txt
 
-      - name: Debug - Show JSON output
+      - name: Debug - Show test output
         shell: bash
         run: |
-          echo "=== JSON test output ==="
-          cat results.json
-          echo "=== End JSON output ==="
+          echo "=== Test output ==="
+          cat results.txt
+          echo "=== End test output ==="
 
       - name: Extract bench results
         shell: bash
         run: |
-          jq -r 'select(.Action=="output" and .Output and (.Output | test("^Benchmark.*\\t.*\\t.*ns/op"))) | [.Package, (.Output | capture("^(?<bench>\\S+)\\s+") | .bench), (.Output | capture(".*\\t.*\\t\\s*(?<nsop>[0-9.]+)\\s*ns/op") | .nsop)] | @tsv' results.json > bench.tsv
-          echo "=== Bench TSV output ==="
+          grep "^Benchmark" results.txt > bench.tsv
+          echo "=== Bench results ==="
           cat bench.tsv
-          echo "=== End Bench TSV ==="
+          echo "=== End bench results ==="
 
       - name: Extract test results
         shell: bash
         run: |
-          jq -r 'select((.Action=="pass" or .Action=="fail") and .Test) | [.Package, .Test, .Action, (.Elapsed|tostring)] | @tsv' results.json > tests.tsv
+          grep "github.com/outrigdev/goid" results.txt | grep -i "ok\|fail" > tests.tsv
+          echo "=== Test results ==="
+          cat tests.tsv
+          echo "=== End test results ==="
 
       - name: Upload results
         uses: actions/upload-artifact@v4
