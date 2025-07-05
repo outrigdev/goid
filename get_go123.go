@@ -167,7 +167,7 @@ func getg() *g
 func Get() uint64 {
 	gptr := getg()
 	if gptr == nil {
-		return GetFromStack()
+		return getFromStack()
 	}
 	return gptr.goid
 }

@@ -12,9 +12,9 @@ const goroutinePrefix = "goroutine "
 
 var goroutinePrefixBytes = []byte(goroutinePrefix)
 
-// GetFromStack extracts goroutine ID from stack trace (fallback method)
+// getFromStack extracts goroutine ID from stack trace (fallback method)
 // optimized to avoid allocations and regexps.
-func GetFromStack() uint64 {
+func getFromStack() uint64 {
 	var buf [64]byte
 	n := runtime.Stack(buf[:], false)
 	b := buf[:n]
@@ -37,4 +37,9 @@ func GetFromStack() uint64 {
 		id = id*10 + uint64(c-'0')
 	}
 	return id
+}
+
+func GetFromStack() uint64 {
+	// Use the optimized stack trace method to get goroutine ID
+	return getFromStack()
 }
