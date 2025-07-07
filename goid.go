@@ -39,6 +39,21 @@ func getFromStack() uint64 {
 	return id
 }
 
+// GetFromStack returns the current goroutine ID by parsing the stack trace.
+//
+// This function provides a universal fallback method that works on all Go versions
+// and architectures. It extracts the goroutine ID from the first line of the stack
+// trace output using optimized parsing that avoids allocations and regular expressions.
+//
+// While significantly slower than the optimized assembly implementations available
+// for Go 1.23-1.24 on amd64/arm64, this method provides reliable compatibility
+// across all platforms and Go versions.
+//
+// This function is automatically used as a fallback by Get() when the optimized
+// assembly implementation is not available, but can also be called directly for
+// testing or comparison purposes.
+//
+// Returns 0 if the goroutine ID cannot be parsed from the stack trace.
 func GetFromStack() uint64 {
 	// Use the optimized stack trace method to get goroutine ID
 	return getFromStack()

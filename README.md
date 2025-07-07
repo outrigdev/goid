@@ -1,6 +1,6 @@
 # goid
 
-A high-performance Go package for retrieving the current goroutine ID.
+A high-performance Go package for retrieving the current goroutine ID using optimized assembly implementations for Go 1.23-1.24 on amd64/arm64, with automatic fallback to a stack trace method for maximum compatibility.
 
 ## Version Compatibility & Optimization
 
@@ -8,13 +8,17 @@ A high-performance Go package for retrieving the current goroutine ID.
 - **Future-proofed**: Automatic fallback to stack trace method for newer and older Go versions or unsupported architectures
 - **Universal compatibility**: Works on all Go versions and architectures (via slower fallback for unsupported versions)
 
-## Overview
+## ⚠️ Important Notice
 
-The `goid` package provides ultra-fast access to the current goroutine ID using optimized assembly implementations for Go 1.23-1.24 on amd64/arm64, with automatic fallback to a stack trace method for maximum compatibility.
+**The Go team explicitly discourages accessing goroutine IDs in production code.** Goroutine IDs are considered internal implementation details and should not be relied upon for application logic. The Go runtime intentionally does not expose goroutine IDs through its public API.
+
+This library was specifically created for and maintained by [**Outrig**](https://github.com/outrigdev/outrig) - a dev time observability tool for Go servers. It's appropriate for debugging, development tools, profiling, and observability systems where understanding goroutine behavior is essential.
+
+**You've been warned** - now feel free to use it responsibly! 😄
 
 ## Features
 
-- **Ultra-fast performance**: Direct assembly access to goroutine ID on Go 1.23-1.24 (amd64/arm64)
+- **High-performance**: Direct assembly access to goroutine ID on Go 1.23-1.24 (amd64/arm64)
 - **Automatic fallback**: Stack trace method for all other Go versions or architectures
 - **Future-proofed**: Graceful degradation for newer Go versions until optimizations are added
 - **Zero dependencies**: Pure Go implementation with no external dependencies

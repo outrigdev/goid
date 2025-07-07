@@ -166,7 +166,8 @@ type g struct {
 // getg returns the current goroutine pointer (implemented in assembly)
 func getg() *g
 
-// Get returns the current goroutine ID using the fast assembly method for Go 1.24
+// Get returns the current goroutine ID using the optimized assembly implementation for Go 1.24 on amd64/arm64.
+// This implementation directly accesses the goroutine structure in memory for maximum performance.
 func Get() uint64 {
 	gptr := getg()
 	if gptr == nil {
