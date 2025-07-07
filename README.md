@@ -77,6 +77,13 @@ The optimized `Get()` function is approximately **1000x+ faster** than the stack
 
 This substantial speed-up is particularly beneficial for debugging, tracing, logging, or other scenarios where retrieving goroutine IDs frequently occurs.
 
+## Testing & Benchmarks
+
+For comprehensive testing and performance results across GitHub Actions runner platforms:
+
+- **[Test Results](testresults.md)** - Correctness testing across available GitHub runner platforms and Go versions
+- **[Benchmark Results](benchmarks.md)** - Performance benchmarks across available GitHub runner platforms and Go versions
+
 ## Supported Platforms
 
 ### Optimized Assembly Implementation
