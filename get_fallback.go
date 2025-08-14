@@ -1,4 +1,4 @@
-//go:build !go1.23 || go1.25 || (go1.23 && !go1.25 && !(amd64 || arm64))
+//go:build !go1.23 || go1.26 || (go1.23 && !go1.26 && !(amd64 || arm64))
 
 // Copyright 2025, Command Line Inc.
 // SPDX-License-Identifier: Apache-2.0
@@ -7,7 +7,7 @@ package goid
 
 // Get returns the current goroutine ID using the fastest available method.
 //
-// On Go 1.23-1.24 with amd64/arm64 architectures, this function uses an optimized
+// On Go 1.23-1.25 with amd64/arm64 architectures, this function uses an optimized
 // assembly implementation that directly accesses the goroutine structure for
 // maximum performance.
 //
