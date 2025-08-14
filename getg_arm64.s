@@ -1,4 +1,4 @@
-// +build go1.23,!go1.25
+// +build go1.23,!go1.26
 
 // Copyright (c) 2024 Outrig, Inc.
 // Licensed under the Apache License, Version 2.0
