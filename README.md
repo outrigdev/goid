@@ -1,10 +1,10 @@
 # goid
 
-A high-performance Go package for retrieving the current goroutine ID using optimized assembly implementations for Go 1.23-1.24 on amd64/arm64, with automatic fallback to a stack trace method for maximum compatibility.
+A high-performance Go package for retrieving the current goroutine ID using optimized assembly implementations for Go 1.23-1.25 on amd64/arm64, with automatic fallback to a stack trace method for maximum compatibility.
 
 ## Version Compatibility & Optimization
 
-- **Optimized for Go 1.23 and 1.24** on **amd64** and **arm64** architectures
+- **Optimized for Go 1.23, 1.24, and 1.25** on **amd64** and **arm64** architectures
 - **Future-proofed**: Automatic fallback to stack trace method for newer and older Go versions or unsupported architectures
 - **Universal compatibility**: Works on all Go versions and architectures (via slower fallback for unsupported versions)
 
@@ -18,7 +18,7 @@ This library was specifically created for and maintained by [**Outrig**](https:/
 
 ## Features
 
-- **High-performance**: Direct assembly access to goroutine ID on Go 1.23-1.24 (amd64/arm64)
+- **High-performance**: Direct assembly access to goroutine ID on Go 1.23-1.25 (amd64/arm64)
 - **Automatic fallback**: Stack trace method for all other Go versions or architectures
 - **Future-proofed**: Graceful degradation for newer Go versions until optimizations are added
 - **Zero dependencies**: Pure Go implementation with no external dependencies
@@ -55,7 +55,7 @@ func main() {
 ### `Get() uint64`
 
 Returns the current goroutine ID using the fastest available method:
-- On Go 1.23+ with amd64/arm64: Uses optimized assembly implementation
+- On Go 1.23-1.25 with amd64/arm64: Uses optimized assembly implementation
 - On other versions/architectures: Falls back to stack trace method
 
 ### `GetFromStack() uint64`
@@ -91,8 +91,8 @@ For comprehensive testing and performance results across GitHub Actions runner p
 ## Supported Platforms
 
 ### Optimized Assembly Implementation
-- Go 1.23, 1.24 on amd64 architecture
-- Go 1.23, 1.24 on arm64 architecture
+- Go 1.23, 1.24, 1.25 on amd64 architecture
+- Go 1.23, 1.24, 1.25 on arm64 architecture
 
 ### Stack Trace Fallback
 - All Go versions on all architectures
@@ -137,9 +137,10 @@ The assembly functions (`getg()`) retrieve the current goroutine pointer, and th
 | 1.24       | amd64        | ✅              | ✅        | Assembly + struct access |
 | 1.24       | arm64        | ✅              | ✅        | Assembly + struct access |
 | 1.24       | other        | ❌              | ❌        | Stack trace fallback |
-| 1.25+      | all          | ❌              | ❌        | Stack trace fallback |
-
-**Note**: Go 1.25 optimization will be added as soon as Go 1.25 stable is released.
+| 1.25       | amd64        | ✅              | ✅        | Assembly + struct access |
+| 1.25       | arm64        | ✅              | ✅        | Assembly + struct access |
+| 1.25       | other        | ❌              | ❌        | Stack trace fallback |
+| 1.26+      | all          | ❌              | ❌        | Stack trace fallback |
 
 ## License
 
